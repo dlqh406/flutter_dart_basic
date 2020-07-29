@@ -1,110 +1,83 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
-void main(){
-//class extends하기, 변수안에 넣엇
-var person = new Person("lee", 13);
-print(person.name);
-print(person.age);
-
-var person2 = new Person2('leee',25);
-person2.name = "444";
-print(person2.name);
-
-var person3 = new Person3()..setAge(10);
-print(person3.age);
-
-// => 람다식 사용하기: 괄호를 줄일 수 있다
-void func() => print("lam");
-
-
-// Future(중요) : 비동기 코드
-print('start');
-netWorkRequest();
-print('Finish');
-
+void main() {
+  runApp(MyApp());
 }
 
-
-Future netWorkRequest() async{
-  print('네트워크 요청 시작');
-  await Future.delayed(Duration(seconds: 1));
-  print('1');
-  await Future.delayed(Duration(seconds: 1));
-  print('2');
-  await Future.delayed(Duration(seconds: 1));
-  print('3');
-}
-
-
-
-
-
-// class를 상속받을 때//  전체를 받을 때 : extends // methods만 받을때 : implement // 필요한 것만 받을 때: with
-class Employee extends Person {
-  Employee(String name, int age) : super(name, age);
-}
-
-class Employee2 implements Person {
+class MyApp extends StatelessWidget {
+  // This widget is the root of your application.
   @override
-  int age;
-  @override
-  String name;
-  @override
-  void setAge(int age) {
-    // TODO: implement setAge
-  }
-  @override
-  void setName(String name) {
-    // TODO: implement setName
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+
+        primarySwatch: Colors.blue,
+
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: MyHomePage(title: 'Flutter Demo Home Page'),
+    );
   }
 }
 
-class Employee3 with Person3{
+class MyHomePage extends StatefulWidget {
+  MyHomePage({Key key, this.title}) : super(key: key);
+
+  final String title;
 
   @override
-  void setName(String name) {
-
-  }
+  _MyHomePageState createState() => _MyHomePageState();
 }
 
+class _MyHomePageState extends State<MyHomePage> {
+  int _counter = 0;
+  //초기값을 0을 줌 int값이니깐
+  StreamController _streamController = StreamController<int>()..add(0);
 
-class Person {
-  String name = "lee";
-  int age=0;
-
-  Person(this.name, this.age);
-
-  void setName (String name) => this.name = name;
-  void setAge (int age) => this.age = age;
-
-}
-
-
-class Person2 {
-  // _ <=는 private 변수임 괄호안에서만 쓰겠
-  String _name;
-  int _age;
-  Person2(this._name, this._age);
-
-  String get name => '제 이름은 $_name 입니다';
-
-  set name(String value) {
-    _name = value;
+  void _incrementCounter() {
+    //setState()를 넣을경우 모든 페이지가 reloading되기때문에 데이터 처리 효율 손
+    _counter ++;
+    _streamController.add(_counter);
   }
 
-  int get age => _age;
 
-  set age(int value) {
-    _age = value;
+  @override
+  Widget build(BuildContext context) {
+
+    return Scaffold(
+      appBar: AppBar(
+
+        title: Text(widget.title),
+      ),
+      body: Center(
+
+        child: Column(
+
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              'You have pushed the button this many times:',
+            ),
+            StreamBuilder<int>(
+              stream: _streamController.stream , // 함수에서 _streamController.add(_counter);으로 저장된 값을
+              builder: (context, snapshot) { // snapshot객체에 저장됨
+                return Text(  // text앞에서 option + 엔터 : streambuilder  만들기
+                  '${snapshot.data}', //data에는 _counter(int)가 들어가있음
+                  style: Theme.of(context).textTheme.headline4,
+                );
+              }
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementCounter,
+        tooltip: 'Increment',
+        child: Icon(Icons.add),
+      ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
   }
-}
-
-
-class Person3 {
-  String name = "lee";
-  int age = 0;
-
-  void setName (String name) => this.name = name;
-  void setAge (int age) => this.age = age;
-
 }
